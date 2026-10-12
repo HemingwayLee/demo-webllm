@@ -1,0 +1,19 @@
+{
+  "name": "webllm-model-manager",
+  "version": "1.0.0",
+  "description": "Chrome extension to manage downloaded WebLLM models",
+  "scripts": {
+    "build": "node build.mjs",
+    "icons": "node make-icons.mjs"
+  },
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@mlc-ai/web-llm": "^0.2.86"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "sharp": "^0.35.5"
+  },
+  "private": true
+}

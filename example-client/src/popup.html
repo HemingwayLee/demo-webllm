@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>WebLLM Example Client</title>
+  <style>
+    :root { --bg: #ffffff; --text: #1d1d1f; --muted: #6e6e73; --border: #d9d9de; --accent: #0a66c2; --bad: #c62828; }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #1c1c1f; --text: #f2f2f4; --muted: #9a9aa2; --border: #3a3a40; --accent: #4c9aff; --bad: #ff6b6b; }
+    }
+    body { width: 380px; margin: 0; padding: 16px; background: var(--bg); color: var(--text); font: 14px/1.5 system-ui, sans-serif; }
+    h1 { font-size: 1rem; margin: 0 0 12px; }
+    label { display: block; color: var(--muted); font-size: 0.8rem; margin: 10px 0 4px; }
+    input, select, textarea, button { width: 100%; box-sizing: border-box; font: inherit; padding: 6px 8px; border: 1px solid var(--border); border-radius: 6px; background: var(--bg); color: var(--text); }
+    textarea { resize: vertical; }
+    button { margin-top: 8px; background: var(--accent); border-color: var(--accent); color: #fff; cursor: pointer; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    #status { color: var(--muted); font-size: 0.8rem; margin-top: 8px; min-height: 1.2em; }
+    #status.error { color: var(--bad); }
+    #answer { white-space: pre-wrap; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <h1>WebLLM Example Client</h1>
+
+  <label for="manager-id">WebLLM Model Manager's extension ID</label>
+  <input id="manager-id" placeholder="Copy it from the manager page">
+  <!-- Pre-filled with the manager's fixed ID. Only change it if your manager has a different ID. -->
+
+  <label for="model">Model</label>
+  <select id="model"><option value="">Enter the ID first</option></select>
+
+  <label for="prompt">Prompt</label>
+  <textarea id="prompt" rows="3">Explain WebGPU in one sentence.</textarea>
+
+  <button id="send" disabled>Send</button>
+  <div id="status"></div>
+  <div id="answer"></div>
+
+  <script type="module" src="popup.js"></script>
+</body>
+</html>

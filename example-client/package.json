@@ -1,0 +1,19 @@
+{
+  "name": "webllm-example-client",
+  "version": "1.0.0",
+  "description": "Demo Chrome extension that chats using models from WebLLM Model Manager",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node build.mjs",
+    "icons": "node make-icons.mjs"
+  },
+  "license": "ISC",
+  "dependencies": {
+    "@mlc-ai/web-llm": "^0.2.86"
+  },
+  "devDependencies": {
+    "esbuild": "^0.28.2",
+    "sharp": "^0.35.5"
+  }
+}

@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WebLLM Model Manager</title>
+  <link rel="icon" href="icons/icon-32.png">
+  <link rel="stylesheet" href="manager.css">
+</head>
+<body>
+  <main>
+    <header>
+      <h1>WebLLM Model Manager</h1>
+      <p class="muted" id="summary">Loading…</p>
+      <p class="banner bad" id="gpu-warning" hidden>
+        WebGPU isn't available in this browser, so models can't be downloaded here.
+        You can still see and remove downloaded models.
+      </p>
+    </header>
+
+    <section class="card share">
+      <div class="id-row">
+        <span class="label">Extension ID</span>
+        <code id="extension-id"></code>
+        <button id="copy-id">Copy ID</button>
+      </div>
+      <p class="muted">
+        Other Chrome extensions use this ID to run your downloaded models, so each model
+        is only downloaded once. <span id="id-note"></span>
+      </p>
+      <details>
+        <summary>Show code for other extensions</summary>
+        <p class="muted">In the other extension (it needs <code>@mlc-ai/web-llm</code>):</p>
+        <pre><code id="snippet"></code></pre>
+      </details>
+    </section>
+
+    <section>
+      <h2>Downloaded models</h2>
+      <ul class="models" id="downloaded"></ul>
+      <p class="muted empty" id="downloaded-empty" hidden>No models downloaded yet. Pick one below.</p>
+    </section>
+
+    <section>
+      <h2>Available models</h2>
+      <div class="filters">
+        <input type="search" id="search" placeholder="Search models, e.g. llama, qwen, phi">
+        <label><input type="checkbox" id="small-only"> Small models only</label>
+      </div>
+      <ul class="models" id="available"></ul>
+    </section>
+  </main>
+  <script type="module" src="manager.js"></script>
+</body>
+</html>

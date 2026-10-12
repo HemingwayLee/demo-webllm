@@ -1,0 +1,30 @@
+{
+  "manifest_version": 3,
+  "name": "WebLLM Model Manager",
+  "version": "0.1.0",
+  "key": "MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwu7HX8twlcXhnvptbLeCNMRRu/BR/WGyHgVuGGiwGQKU9bGReHf6eLuX0rghRp8wVYLKpNVhfTjzEf5kX7DjjhHKDcPfm394jozIStysaaxZlmVfmNCrSid51pQ/U6obMtH26RzQIqcXiUMmcnRmPZs/tP/xaM5gYMP6aSJ66ol1JaOVycJh6Zt/oQD0h7enKisM9f5OezPUw8szcX06S6lpsVmZNTyd7Qjxo5+1cBgW3tbWFHgDK1dLDSL0ycAPuehglQOYCCQE1QiGNQ9HjUyzd8oY0M8zdpNnt7yUD7qEoWOeTG8dTmKPLHKNjNoRdwWbdSBndXTFqv5ZBuo0sQIDAQAB",
+  "description": "See which WebLLM models are downloaded, remove them, and download them again.",
+  "icons": {
+    "16": "icons/icon-16.png",
+    "32": "icons/icon-32.png",
+    "48": "icons/icon-48.png",
+    "128": "icons/icon-128.png"
+  },
+  "action": {
+    "default_title": "Open WebLLM Model Manager",
+    "default_icon": {
+      "16": "icons/icon-16.png",
+      "32": "icons/icon-32.png"
+    }
+  },
+  "background": {
+    "service_worker": "background.js",
+    "type": "module"
+  },
+  "permissions": [
+    "unlimitedStorage"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self' 'wasm-unsafe-eval'; object-src 'self'"
+  }
+}

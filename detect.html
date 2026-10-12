@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>WebGPU Check</title>
+  <style>
+    :root {
+      --bg: #f7f7f8;
+      --card: #ffffff;
+      --text: #1d1d1f;
+      --muted: #6e6e73;
+      --border: #e3e3e6;
+      --ok: #1a7f37;
+      --ok-bg: #e6f4ea;
+      --bad: #c62828;
+      --bad-bg: #fdecea;
+      --warn: #9a6700;
+      --warn-bg: #fff4d6;
+    }
+    @media (prefers-color-scheme: dark) {
+      :root {
+        --bg: #121214;
+        --card: #1c1c1f;
+        --text: #f2f2f4;
+        --muted: #9a9aa2;
+        --border: #2e2e33;
+        --ok: #4ac26b;
+        --ok-bg: #12301b;
+        --bad: #ff6b6b;
+        --bad-bg: #3a1616;
+        --warn: #e3b341;
+        --warn-bg: #3a2e10;
+      }
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      padding: 32px 16px;
+      background: var(--bg);
+      color: var(--text);
+      font: 16px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+    }
+    main { max-width: 640px; margin: 0 auto; }
+    h1 { font-size: 1.5rem; margin: 0 0 4px; }
+    .sub { color: var(--muted); margin: 0 0 24px; }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 20px;
+      margin-bottom: 16px;
+    }
+    .status {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      font-size: 1.25rem;
+      font-weight: 600;
+    }
+    .status.ok   { color: var(--ok);   background: var(--ok-bg); }
+    .status.bad  { color: var(--bad);  background: var(--bad-bg); }
+    .status.warn { color: var(--warn); background: var(--warn-bg); }
+    .status .icon { font-size: 1.75rem; }
+    .status p { margin: 4px 0 0; font-size: 0.95rem; font-weight: 400; color: var(--text); }
+    h2 { font-size: 1rem; margin: 0 0 12px; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.95rem; }
+    td { padding: 6px 0; border-bottom: 1px solid var(--border); vertical-align: top; }
+    td:first-child { color: var(--muted); width: 45%; padding-right: 12px; }
+    td:last-child { word-break: break-word; }
+    tr:last-child td { border-bottom: none; }
+    .pass { color: var(--ok); }
+    .fail { color: var(--bad); }
+    details summary { cursor: pointer; font-weight: 600; }
+    ul { margin: 8px 0 0; padding-left: 20px; }
+    code { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 0.9em; }
+  </style>
+</head>
+<body>
+  <main>
+    <h1>Does my browser support WebGPU?</h1>
+    <p class="sub">WebLLM needs WebGPU to run AI models in your browser.</p>
+
+    <div id="status" class="card status warn">
+      <span class="icon">⏳</span>
+      <div>Checking…</div>
+    </div>
+
+    <div class="card">
+      <h2>Checks</h2>
+      <table id="checks"></table>
+    </div>
+
+    <div class="card" id="gpu-card" hidden>
+      <h2>Your GPU</h2>
+      <table id="gpu"></table>
+    </div>
+
+    <div class="card" id="help-card" hidden>
+      <details open>
+        <summary>How to fix it</summary>
+        <ul>
+          <li>Update your browser. WebGPU is on by default in Chrome/Edge 113+, Safari 26+, and Firefox 141+ (Windows) or 145+ (macOS on Apple Silicon).</li>
+          <li>Open this page over <code>https://</code> or <code>http://localhost</code>. WebGPU is blocked on plain <code>http://</code> pages and on <code>file://</code> in some browsers.</li>
+          <li>Update your graphics drivers. Browsers turn WebGPU off for some older or blocklisted GPUs.</li>
+          <li>In Chrome, open <code>chrome://gpu</code> to see why WebGPU is unavailable.</li>
+        </ul>
+      </details>
+    </div>
+  </main>
+
+  <script>
+    const checksEl = document.getElementById("checks");
+    const gpuEl = document.getElementById("gpu");
+
+    function addRow(table, label, value, cls) {
+      const tr = document.createElement("tr");
+      const a = document.createElement("td");
+      const b = document.createElement("td");
+      a.textContent = label;
+      b.textContent = value;
+      if (cls) b.className = cls;
+      tr.append(a, b);
+      table.append(tr);
+    }
+
+    function setStatus(kind, icon, title, detail) {
+      const el = document.getElementById("status");
+      el.className = "card status " + kind;
+      el.innerHTML = "";
+      const i = document.createElement("span");
+      i.className = "icon";
+      i.textContent = icon;
+      const box = document.createElement("div");
+      box.textContent = title;
+      const p = document.createElement("p");
+      p.textContent = detail;
+      box.append(p);
+      el.append(i, box);
+      document.getElementById("help-card").hidden = kind === "ok";
+    }
+
+    async function detect() {
+      addRow(checksEl, "Browser", navigator.userAgent);
+
+      const secure = window.isSecureContext;
+      addRow(checksEl, "Secure context (https or localhost)", secure ? "Yes" : "No", secure ? "pass" : "fail");
+
+      const hasApi = "gpu" in navigator;
+      addRow(checksEl, "navigator.gpu exists", hasApi ? "Yes" : "No", hasApi ? "pass" : "fail");
+
+      if (!hasApi) {
+        setStatus("bad", "❌", "WebGPU is not supported",
+          secure
+            ? "This browser doesn't expose the WebGPU API. Try a newer browser."
+            : "This page isn't in a secure context. Open it over https:// or http://localhost.");
+        return;
+      }
+
+      let adapter = null;
+      try {
+        adapter = await navigator.gpu.requestAdapter();
+      } catch (e) {
+        addRow(checksEl, "GPU adapter", "Error: " + e.message, "fail");
+      }
+
+      if (!adapter) {
+        if (!checksEl.textContent.includes("GPU adapter")) {
+          addRow(checksEl, "GPU adapter", "None found", "fail");
+        }
+        setStatus("bad", "❌", "WebGPU API found, but no GPU is available",
+          "Your browser supports WebGPU, but it couldn't get a GPU. Your GPU or driver may be blocklisted or disabled.");
+        return;
+      }
+      addRow(checksEl, "GPU adapter", "Found", "pass");
+
+      let device = null;
+      try {
+        device = await adapter.requestDevice();
+        addRow(checksEl, "GPU device", "Created", "pass");
+      } catch (e) {
+        addRow(checksEl, "GPU device", "Error: " + e.message, "fail");
+        setStatus("bad", "❌", "Couldn't create a GPU device",
+          "An adapter was found, but creating a device failed.");
+        return;
+      }
+
+      const shaderF16 = adapter.features.has("shader-f16");
+      addRow(checksEl, "shader-f16 feature", shaderF16 ? "Yes" : "No", shaderF16 ? "pass" : null);
+
+      // Show GPU details
+      document.getElementById("gpu-card").hidden = false;
+      const info = adapter.info || (adapter.requestAdapterInfo ? await adapter.requestAdapterInfo().catch(() => null) : null);
+      if (info) {
+        addRow(gpuEl, "Vendor", info.vendor || "(hidden by browser)");
+        addRow(gpuEl, "Architecture", info.architecture || "(hidden by browser)");
+        if (info.description) addRow(gpuEl, "Description", info.description);
+      }
+      const mb = (n) => (n / (1024 * 1024)).toFixed(0) + " MB";
+      addRow(gpuEl, "Max buffer size", mb(adapter.limits.maxBufferSize));
+      addRow(gpuEl, "Max storage buffer binding", mb(adapter.limits.maxStorageBufferBindingSize));
+      const isFallback = Boolean(info?.isFallbackAdapter ?? adapter.isFallbackAdapter);
+      addRow(gpuEl, "Fallback (software) adapter", isFallback ? "Yes" : "No");
+
+      device.destroy();
+
+      if (isFallback) {
+        setStatus("warn", "⚠️", "WebGPU works, but on a software fallback",
+          "Models will run very slowly. Check your GPU drivers or browser GPU settings.");
+      } else {
+        setStatus("ok", "✅", "WebGPU is supported!",
+          shaderF16
+            ? "Your browser can run WebLLM, including models that use 16-bit (f16) math."
+            : "Your browser can run WebLLM. Choose models ending in q4f32 because your GPU doesn't support f16.");
+      }
+    }
+
+    detect().catch((e) => {
+      setStatus("bad", "❌", "Something went wrong during the check", e.message);
+    });
+  </script>
+</body>
+</html>

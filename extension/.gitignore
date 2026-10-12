@@ -1,0 +1,5 @@
+node_modules/
+dist/
+
+# Private key for the manager extension. Keep it secret; never commit it.
+manager-key.pem
